@@ -1,11 +1,11 @@
 ---
-#- name: Debian | Install Packages
-#  apt: >
-#   pkg={{ item }}
-#   update_cache=yes
-#   state=present
-#  with_items:
-#   - "{{ mysql.pkg }}"
+- name: Debian | Install Packages
+  apt: >
+   pkg={{ item }}
+   update_cache=yes
+   state=present
+  with_items:
+   - "{{ mysql.pkg }}"
 
 - name: Debian | Install python-mysqldb
   apt: >
