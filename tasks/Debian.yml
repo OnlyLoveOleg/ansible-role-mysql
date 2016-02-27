@@ -1,37 +1,47 @@
 ---
-- name: Debian | Install Packages
-  apt: >
+- name: Debian | install mysql server
+  apt:
    pkg={{ item }}
    update_cache=yes
    state=present
   with_items:
    - "{{ mysql.pkg }}"
 
-- name: Debian | Install python-mysqldb
-  apt: >
+
+- name: Debian | install python-mysqldb
+  apt:
    name=python-mysqldb
    state=latest
    update_cache=yes
   when: mysql_replication is defined
 
-- name: Debian | Copy the main configuration file my.cnf
-  template: >
-   src={{ mysql_cfg_dir | default("./templates") }}/my.cnf
+
+- name: Debian | copy the main configuration file my.cnf
+  template:
+   src={{ mysql_my_cnf }}
    dest=/etc/mysql/my.cnf
-   owner=root group=root mode=0644
+   owner=root
+   group=root
+   mode=0644
+  when: mysql_my_cnf is defined
   notify: restart mysql
 
-- name: Debian | Copy conf.d configuration files
-  template: >
+
+- name: Debian | copy configuration files to conf.d
+  template:
    src={{ item }}
    dest=/etc/mysql/conf.d/{{ item | basename }}
-   owner=root group=root mode=0644
-  with_fileglob: "{{ mysql_cfg_dir | default('./templates') }}/conf.d/*.cnf"
+   owner=root
+   group=root
+   mode=0644
+  with_fileglob: "{{ mysql_conf_d | default([]) }}/*"
   notify: restart mysql
+
 
 #- name: Debian | Replication | Restart MySQL if Replication Config Updated
 #  service: name={{ mysql_platform.service_name }} state=restarted
 #  when: replicationCfg|changed
+
 
 - name: Debian | Replication | Create Replication User on Master
   mysql_user:

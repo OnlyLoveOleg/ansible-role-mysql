@@ -1,3 +1,2 @@
 ---
-mysql_platform:
- service_name: mysql
+mysql_service_name: mysql

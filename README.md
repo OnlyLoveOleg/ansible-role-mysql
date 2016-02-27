@@ -1,10 +1,7 @@
 mysql
 =====
 
-Install and manage MySQL server.
-
-Tested on:
- - Ubuntu Server 14.04 LTS x64
+Role to install and manage MySQL server.
 
 
 Role Variables
@@ -22,24 +19,28 @@ mysql:
   pkg: mysql-server-5.6
 ```
 
-`mysql_cfg_dir` (OPTIONAL)
+`mysql_my_cnf` (OPTIONAL)
 
-This is the full path to the configuration files. In this path the role expects to find
-the main my.cnf file and optional conf.d directory. All files `conf.d/*.cnf` will be copied
-to the remotes conf.d.
+  Relative or full path to the main my.cnf file that will be copied to remote.
 
-If `mysql_cfg_dir` not defined the role will use the default my.cnf from the template directory.
+
+`mysql_conf_d` (OPTIONAL)
+
+  Relative or full path to additional configuration files that will be copied to remote's
+  conf.d directory.
+
 
 Example (Recommended to define in group_vars or host_vars):
 
 ```
 host_vars/db01.example.org.yml
-  mysql_cfg_dir: /etc/ansible/host_files/db01.example.org/mysql
+  mysql_my_cnf: host_files/db01.example.org/mysql/my.cnf
+  mysql_conf_d: host_files/db01.example.org/mysql/conf.d
 
 
 The actual configs:
 
-/etc/ansible/host_files/db01.example.org/mysql/
+host_files/db01.example.org/mysql
 ├── my.cnf
 └── conf.d
     ├── replication.cnf
@@ -57,4 +58,4 @@ Author Information
 
 Tal Lannder
 
-tallannder@gmail.com
+tal@pjili.org
