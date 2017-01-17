@@ -1,30 +1,13 @@
 ---
-- name: Check for supported operating system on target
+- name: check for supported operating system on target
   fail:
     msg: "The operating system of the target machine ({{ inventory_hostname }}) is not currently supported."
-  when: ( ansible_distribution == "Ubuntu" and ansible_distribution_major_version not in ['14'] )
+  when: ( ansible_distribution == "Ubuntu" and ansible_distribution_major_version not in ['14', '16'] )
 
 
-- name: include os specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+# - name: include distro specific variables
+#   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
 
-- name: Include Debian specific tasks
-  include: Debian.yml
-  when: ansible_os_family == 'Debian'
-
-
-#- name: Include RedHat specific tasks
-#  include: RedHat.yml
-#  when: ansible_os_family == 'RedHat'
-#
-#- name: Include Suse specific tasks
-#  include: Suse.yml
-#  when: ansible_os_family == 'Suse'
-
-
-- name: Ensure Service is Started and Enabled
-  service: >
-   name={{ mysql_service_name }}
-   state=started
-   enabled=yes
+- name: include distro specific tasks
+  include: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"

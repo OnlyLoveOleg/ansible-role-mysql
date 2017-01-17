@@ -1,5 +1,11 @@
 ---
 - name: restart mysql
-  service: >
-   name={{ mysql_platform.service_name }}
+  service:
+   name=mysql
+   state=restarted
+
+
+- name: restart mysqld
+  service:
+   name=mysqld
    state=restarted

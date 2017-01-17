@@ -1,0 +1,72 @@
+---
+- name: ubuntu-16 | install mysql server
+  apt:
+   name="mysql-server-{{ mysql_version }}"
+   update_cache=yes
+   state=present
+
+
+# - name: ubuntu-16 | install python-mysqldb
+#   apt:
+#    name=python-mysqldb
+#    state=latest
+#    update_cache=yes
+#   when: mysql_replication is defined
+
+
+- name: print the source of my.cnf file
+  debug:
+    msg="{{ mysql_cfg }}"
+  when: mysql_cfg is defined
+
+
+- name: ubuntu-16 | copy the main configuration file my.cnf
+  template:
+   src={{ mysql_cfg }}
+   dest=/etc/mysql/my.cnf
+   owner=root
+   group=root
+   mode=0644
+  when: mysql_cfg is defined
+  notify: restart mysql
+
+
+- name: print the location of conf.d files
+  debug:
+    msg="{{ mysql_conf_d }}"
+  when: mysql_conf_d is defined
+
+
+- name: ubuntu-16 | copy configuration files to conf.d
+  template:
+   src={{ item }}
+   dest=/etc/mysql/conf.d/{{ item | basename }}
+   owner=root
+   group=root
+   mode=0644
+  with_fileglob: "{{ mysql_conf_d | default([]) }}/*"
+  notify: restart mysql
+
+
+# - name: ubuntu-16 | replication | restart mysql if replication Config Updated
+#   service:
+#     name=mysql
+#     state=restarted
+#   when: replication_cfg|changed
+#
+#
+# - name: ubuntu-16 | replication | create replication user on master
+#   mysql_user:
+#     name: "{{ mysql_replication.user }}"
+#     password: "{{ mysql_replication.user_password }}"
+#     priv: "*.*:REPLICATION SLAVE"
+#     host: "%"
+#     state: present
+#   when: mysql_eplication is defined and mysql_replication.role == 'master'
+
+
+- name: ensure service is started and enabled
+  service:
+   name=mysql
+   state=started
+   enabled=yes
